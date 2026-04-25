@@ -145,6 +145,11 @@ app.post('/api/admin/prayers/delete', (req, res) => {
   res.json({ success: true });
 });
 
+// --- Health check (for Render) ---
+app.get('/healthz00m', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // --- Admin: verify password ---
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
