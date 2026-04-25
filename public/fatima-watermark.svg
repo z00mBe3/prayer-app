@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" opacity="0.06">
+  <!-- Our Lady of Fatima silhouette watermark -->
+  <g fill="#1a3a5c" stroke="none">
+    <!-- Head with crown -->
+    <ellipse cx="200" cy="95" rx="28" ry="34"/>
+    <!-- Crown -->
+    <path d="M172 68 L180 50 L188 65 L196 45 L204 65 L212 50 L220 65 L228 68 L220 75 L180 75 Z"/>
+    <!-- Veil / mantle flowing down -->
+    <path d="M160 90 Q155 120 148 180 Q140 260 135 340 Q132 400 145 460 L200 480 L255 460 Q268 400 265 340 Q260 260 252 180 Q245 120 240 90 Q220 110 200 115 Q180 110 160 90 Z"/>
+    <!-- Inner robe -->
+    <path d="M170 130 Q168 200 165 280 Q162 360 170 440 L200 455 L230 440 Q238 360 235 280 Q232 200 230 130 Q215 145 200 148 Q185 145 170 130 Z" fill="#2a4a6c"/>
+    <!-- Hands in prayer -->
+    <path d="M188 260 Q192 240 200 235 Q208 240 212 260 L208 280 Q204 285 200 286 Q196 285 192 280 Z" fill="#4a7aac"/>
+    <!-- Rosary hanging from hands -->
+    <line x1="200" y1="286" x2="200" y2="360" stroke="#1a3a5c" stroke-width="1.5" opacity="0.5"/>
+    <circle cx="200" cy="310" r="3" fill="#1a3a5c" opacity="0.5"/>
+    <circle cx="200" cy="325" r="3" fill="#1a3a5c" opacity="0.5"/>
+    <circle cx="200" cy="340" r="3" fill="#1a3a5c" opacity="0.5"/>
+    <circle cx="200" cy="355" r="3" fill="#1a3a5c" opacity="0.5"/>
+    <!-- Cross at end of rosary -->
+    <rect x="197" y="358" width="6" height="14" rx="1" fill="#1a3a5c" opacity="0.5"/>
+    <rect x="193" y="363" width="14" height="4" rx="1" fill="#1a3a5c" opacity="0.5"/>
+    <!-- Halo / aureola -->
+    <circle cx="200" cy="88" r="45" fill="none" stroke="#4a7aac" stroke-width="1.5" opacity="0.3"/>
+    <circle cx="200" cy="88" r="52" fill="none" stroke="#4a7aac" stroke-width="0.8" opacity="0.2"/>
+    <!-- Stars around (Fatima association) -->
+    <circle cx="155" cy="55" r="2.5" fill="#4a7aac" opacity="0.3"/>
+    <circle cx="245" cy="55" r="2.5" fill="#4a7aac" opacity="0.3"/>
+    <circle cx="140" cy="80" r="2" fill="#4a7aac" opacity="0.25"/>
+    <circle cx="260" cy="80" r="2" fill="#4a7aac" opacity="0.25"/>
+    <circle cx="148" cy="40" r="2" fill="#4a7aac" opacity="0.2"/>
+    <circle cx="252" cy="40" r="2" fill="#4a7aac" opacity="0.2"/>
+    <!-- Base / cloud -->
+    <ellipse cx="200" cy="478" rx="70" ry="15" fill="#1a3a5c" opacity="0.3"/>
+  </g>
+</svg>

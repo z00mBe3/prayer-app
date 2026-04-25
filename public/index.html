@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prayer Intercessions</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #d6eaf8 0%, #aed6f1 50%, #85c1e9 100%);
+            min-height: 100vh;
+            color: #1a3a5c;
+            background-attachment: fixed;
+        }
+
+        /* Fatima watermark */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%; left: 65%;
+            transform: translate(-50%, -50%);
+            width: 400px; height: 600px;
+            background: url('/fatima-watermark.svg') center/contain no-repeat;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container { max-width: 650px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+
+        /* --- Header --- */
+        header { text-align: center; padding: 30px 0 10px; }
+        header h1 { font-size: 2rem; margin-bottom: 8px; color: #1a3a5c; }
+        header p  { color: #2e6291; margin-bottom: 15px; }
+
+        .admin-toggle {
+            background: transparent;
+            border: 1px solid rgba(26,58,92,0.3);
+            color: #2e6291;
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        .admin-toggle:hover { border-color: #1a3a5c; color: #1a3a5c; }
+
+        /* --- Categories --- */
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 25px 0;
+        }
+        .category-btn {
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(26,58,92,0.15);
+            border-radius: 12px;
+            padding: 18px 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: #1a3a5c;
+        }
+        .category-btn:hover { background: rgba(255,255,255,0.7); transform: translateY(-2px); }
+        .category-btn.active { background: #1a3a5c; color: #fff; }
+        .category-btn .icon { font-size: 1.8rem; margin-bottom: 6px; }
+        .category-btn .label { font-size: 0.85rem; font-weight: 500; }
+        .full-width { grid-column: span 2; }
+
+        /* --- Form --- */
+        .prayer-form {
+            background: rgba(255,255,255,0.45);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(4px);
+        }
+        .prayer-form h2 { margin-bottom: 18px; color: #1a3a5c; font-size: 1.2rem; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #2e6291; font-size: 0.85rem; }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%; padding: 11px 14px;
+            border: 1px solid rgba(26,58,92,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.6);
+            color: #1a3a5c; font-size: 1rem;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus { outline: none; border-color: #1a3a5c; }
+        .form-group select { background: rgba(255,255,255,0.8); }
+        .form-group textarea { min-height: 90px; resize: vertical; }
+
+        .submit-btn {
+            width: 100%; padding: 13px;
+            background: #1a3a5c; color: #fff;
+            border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: background 0.3s;
+        }
+        .submit-btn:hover { background: #2e6291; }
+
+        /* --- Confirmation message --- */
+        .confirmation {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(26,58,92,0.2);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(4px);
+        }
+        .confirmation.show { display: block; }
+        .confirmation .check { font-size: 3rem; margin-bottom: 10px; color: #2e6291; }
+        .confirmation h3 { color: #1a3a5c; margin-bottom: 8px; }
+        .confirmation p { color: #2e6291; font-size: 0.9rem; }
+        .confirmation .new-prayer-btn {
+            margin-top: 15px; padding: 10px 24px;
+            background: transparent;
+            border: 1px solid rgba(26,58,92,0.3);
+            color: #1a3a5c; border-radius: 8px;
+            cursor: pointer; font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .confirmation .new-prayer-btn:hover { background: rgba(255,255,255,0.3); }
+
+        /* --- Search / Filter bar (admin only) --- */
+        .filter-bar {
+            display: flex; gap: 10px;
+            margin-bottom: 18px; flex-wrap: wrap;
+        }
+        .filter-bar input {
+            flex: 1; min-width: 180px;
+            padding: 10px 14px;
+            border: 1px solid rgba(26,58,92,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.6);
+            color: #1a3a5c; font-size: 0.9rem;
+        }
+        .filter-bar input:focus { outline: none; border-color: #1a3a5c; }
+        .filter-bar select {
+            padding: 10px 14px;
+            border: 1px solid rgba(26,58,92,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.8);
+            color: #1a3a5c; font-size: 0.9rem;
+        }
+        .filter-bar select:focus { outline: none; border-color: #1a3a5c; }
+
+        /* --- Prayer cards (admin only) --- */
+        .prayer-count { text-align: center; color: #2e6291; margin-bottom: 15px; font-size: 0.85rem; }
+
+        .prayer-card {
+            background: rgba(255,255,255,0.5);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            position: relative;
+            backdrop-filter: blur(4px);
+        }
+        .prayer-card .category-tag {
+            display: inline-block;
+            background: rgba(26,58,92,0.12);
+            color: #1a3a5c;
+            padding: 3px 11px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            margin-bottom: 8px;
+        }
+        .prayer-card .name { font-weight: 600; font-size: 1.05rem; margin-bottom: 6px; color: #1a3a5c; }
+        .prayer-card .request { color: #2e6291; line-height: 1.5; margin-bottom: 8px; }
+        .prayer-card .date { color: #5a8ab5; font-size: 0.78rem; }
+        .prayer-card .meta {
+            display: flex; gap: 15px; flex-wrap: wrap;
+            color: #5a8ab5; font-size: 0.78rem;
+        }
+        .prayer-card .duration-tag {
+            display: inline-block;
+            background: rgba(100,149,237,0.15);
+            color: #8ab4f8;
+            padding: 2px 9px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-left: 6px;
+        }
+
+        .prayer-card .delete-btn {
+            position: absolute; top: 14px; right: 14px;
+            background: rgba(255,107,107,0.15); border: 1px solid rgba(255,107,107,0.3);
+            color: #ff6b6b; cursor: pointer; font-size: 0.8rem;
+            padding: 4px 10px; border-radius: 6px;
+            transition: all 0.3s;
+        }
+        .prayer-card .delete-btn:hover { background: rgba(255,107,107,0.3); }
+
+        .empty-state { text-align: center; padding: 35px; color: #5a8ab5; }
+
+        /* --- Admin modal --- */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(26,58,92,0.6);
+            z-index: 100;
+            justify-content: center; align-items: center;
+        }
+        .modal-overlay.open { display: flex; }
+
+        .modal {
+            background: #e8f4fd;
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%; max-width: 480px;
+            position: relative;
+            color: #1a3a5c;
+        }
+        .modal h2 { color: #1a3a5c; margin-bottom: 20px; font-size: 1.3rem; }
+        .modal .close-modal {
+            position: absolute; top: 15px; right: 18px;
+            background: transparent; border: none;
+            color: #5a8ab5; font-size: 1.4rem; cursor: pointer;
+        }
+        .modal .close-modal:hover { color: #1a3a5c; }
+
+        .modal .form-group input { background: rgba(255,255,255,0.7); color: #1a3a5c; }
+
+        .admin-panel { display: none; }
+        .admin-panel.visible { display: block; }
+
+        .admin-panel h3 { color: #1a3a5c; margin-bottom: 15px; }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.45);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        .stat-card .stat-num { font-size: 1.6rem; font-weight: 700; color: #1a3a5c; }
+        .stat-card .stat-label { font-size: 0.75rem; color: #2e6291; margin-top: 4px; }
+
+        .admin-actions {
+            display: flex; gap: 10px; margin-bottom: 20px;
+        }
+        .export-btn {
+            flex: 1; padding: 14px;
+            background: #4a9e6e; color: #fff;
+            border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: background 0.3s;
+        }
+        .export-btn:hover { background: #3d8a5e; }
+
+        .logout-btn {
+            padding: 14px 20px;
+            background: transparent;
+            border: 1px solid rgba(26,58,92,0.3);
+            color: #2e6291; border-radius: 8px;
+            cursor: pointer; font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover { border-color: #c0392b; color: #c0392b; }
+
+        .admin-prayers-section h3 { color: #1a3a5c; margin-bottom: 12px; }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #1a3a5c; color: #fff;
+            padding: 12px 24px; border-radius: 8px;
+            font-size: 0.9rem; opacity: 0;
+            transition: opacity 0.3s; pointer-events: none; z-index: 200;
+        }
+        .toast.show { opacity: 1; }
+        .toast.error { background: #c0392b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Prayer Intercessions</h1>
+            <p>Bring your intentions before God</p>
+            <button class="admin-toggle" id="adminToggle">Admin</button>
+        </header>
+
+        <!-- Admin Panel (shown after login) -->
+        <div class="admin-panel" id="adminPanel">
+            <h3>Admin Dashboard</h3>
+            <div class="stat-grid" id="statsGrid"></div>
+            <div class="admin-actions">
+                <button class="export-btn" id="exportBtn">Export to Excel</button>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+
+            <!-- Admin-only: prayer list with search/filter/delete -->
+            <div class="admin-prayers-section">
+                <h3>All Intercessions</h3>
+                <div class="filter-bar">
+                    <input type="text" id="searchInput" placeholder="Search intercessions...">
+                    <select id="filterCategory">
+                        <option value="">All Categories</option>
+                        <option value="ill">For the Ill</option>
+                        <option value="dead">For the Deceased</option>
+                        <option value="job">Job Search</option>
+                        <option value="pregnancy">Pregnancy & Children</option>
+                        <option value="immigration">Immigration</option>
+                        <option value="reversion">Reversion/Conversion</option>
+                        <option value="spouse">Future Spouse</option>
+                    </select>
+                </div>
+                <div class="prayer-count" id="prayerCount"></div>
+                <div id="prayersContainer"></div>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="categories" id="categoriesSection">
+            <button class="category-btn" data-category="ill">
+                <div class="icon">🤒</div><div class="label">For the Ill</div>
+            </button>
+            <button class="category-btn" data-category="dead">
+                <div class="icon">🕯️</div><div class="label">For the Deceased</div>
+            </button>
+            <button class="category-btn" data-category="job">
+                <div class="icon">💼</div><div class="label">Job Search</div>
+            </button>
+            <button class="category-btn" data-category="pregnancy">
+                <div class="icon">👶</div><div class="label">Pregnancy & Children</div>
+            </button>
+            <button class="category-btn full-width" data-category="immigration">
+                <div class="icon">🌍</div><div class="label">Immigration (Residence, Citizenship, Work Permits)</div>
+            </button>
+            <button class="category-btn" data-category="reversion">
+                <div class="icon">✝️</div><div class="label">Reversion/Conversion</div>
+            </button>
+            <button class="category-btn" data-category="spouse">
+                <div class="icon">💑</div><div class="label">Future Spouse</div>
+            </button>
+        </div>
+
+        <!-- Prayer Form -->
+        <div class="prayer-form" id="prayerFormSection">
+            <h2 id="formTitle">Submit an Intercession</h2>
+            <form id="prayerForm">
+                <div class="form-group">
+                    <label for="name">Name of Requestor (or leave blank for anonymous)</label>
+                    <input type="text" id="name" placeholder="Enter requestor's name">
+                </div>
+                <div class="form-group">
+                    <label for="request">Intercession For</label>
+                    <textarea id="request" placeholder="Who or what is this intercession for..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="duration">How long should we pray for this intention?</label>
+                    <select id="duration" required>
+                        <option value="one-time">One-time</option>
+                        <option value="3-months">3 Months</option>
+                        <option value="6-months">6 Months</option>
+                        <option value="9-months">9 Months</option>
+                        <option value="12-months">12 Months</option>
+                        <option value="2-years">2 Years</option>
+                        <option value="3-years">3 Years</option>
+                        <option value="perpetual">Perpetual</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">Submit Prayer</button>
+            </form>
+        </div>
+
+        <!-- Confirmation (shown after submit) -->
+        <div class="confirmation" id="confirmation">
+            <div class="check">&#10003;</div>
+            <h3>Intercession Submitted</h3>
+            <p>Your intercession has been received.<br>May God hear your prayer.</p>
+            <button class="new-prayer-btn" id="newPrayerBtn">Submit Another Intercession</button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <h2>Admin Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter admin password" required>
+                </div>
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // --- Config ---
+        const categories = {
+            ill:         { name: 'For the Ill',            icon: '🤒' },
+            dead:        { name: 'For the Deceased',       icon: '🕯️' },
+            job:         { name: 'Job Search',             icon: '💼' },
+            pregnancy:   { name: 'Pregnancy & Children',   icon: '👶' },
+            immigration: { name: 'Immigration',            icon: '🌍' },
+            reversion:   { name: 'Reversion/Conversion',   icon: '✝️' },
+            spouse:      { name: 'Future Spouse',          icon: '💑' }
+        };
+
+        const durationLabels = {
+            'one-time':  'One-time',
+            '3-months':  '3 Months',
+            '6-months':  '6 Months',
+            '9-months':  '9 Months',
+            '12-months': '12 Months',
+            '2-years':   '2 Years',
+            '3-years':   '3 Years',
+            'perpetual': 'Perpetual'
+        };
+
+        let selectedCategory = null;
+        let adminPassword = null;
+        let searchTimeout = null;
+
+        // --- Helpers ---
+        function showToast(msg, isError) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => t.className = 'toast', 2500);
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // --- Show / hide form vs confirmation ---
+        function showForm() {
+            document.getElementById('categoriesSection').style.display = '';
+            document.getElementById('prayerFormSection').style.display = '';
+            document.getElementById('confirmation').classList.remove('show');
+            selectedCategory = null;
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('formTitle').textContent = 'Submit an Intercession';
+        }
+
+        function showConfirmation() {
+            document.getElementById('categoriesSection').style.display = 'none';
+            document.getElementById('prayerFormSection').style.display = 'none';
+            document.getElementById('confirmation').classList.add('show');
+        }
+
+        // --- API calls ---
+        async function createPrayer(data) {
+            const res = await fetch('/api/prayers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return res.json();
+        }
+
+        async function fetchPrayersAdmin(category, search) {
+            const res = await fetch('/api/admin/prayers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: adminPassword, category, search })
+            });
+            return res.json();
+        }
+
+        async function deletePrayer(id) {
+            if (!confirm('Remove this intercession?')) return;
+            await fetch('/api/admin/prayers/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: adminPassword, id })
+            });
+            loadAdminPrayers();
+            loadStats();
+            showToast('Intercession removed');
+        }
+
+        // --- Admin: load prayer list ---
+        async function loadAdminPrayers() {
+            const category = document.getElementById('filterCategory').value;
+            const search   = document.getElementById('searchInput').value.trim();
+            const prayers  = await fetchPrayersAdmin(category, search);
+            const container = document.getElementById('prayersContainer');
+            const countEl   = document.getElementById('prayerCount');
+
+            countEl.textContent = prayers.length + ' intercession' + (prayers.length !== 1 ? 's' : '');
+
+            if (prayers.length === 0) {
+                container.innerHTML = '<div class="empty-state">No intercessions found.</div>';
+                return;
+            }
+
+            container.innerHTML = prayers.map(p => {
+                const durLabel = durationLabels[p.duration] || p.duration || 'One-time';
+                const expiryText = p.expires_at ? 'Expires: ' + p.expires_at : 'Never expires';
+                return `
+                <div class="prayer-card">
+                    <button class="delete-btn" onclick="deletePrayer(${p.id})">Delete</button>
+                    <span class="category-tag">${categories[p.category].icon} ${categories[p.category].name}</span>
+                    <span class="duration-tag">${durLabel}</span>
+                    <div class="name">Requestor: ${escapeHtml(p.name)}</div>
+                    <div class="request">Intercession for: ${escapeHtml(p.request)}</div>
+                    <div class="meta">
+                        <span>Submitted: ${p.created_at}</span>
+                        <span>${expiryText}</span>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // --- Category selection ---
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedCategory = btn.dataset.category;
+                document.getElementById('formTitle').textContent =
+                    'Submit an Intercession — ' + categories[selectedCategory].name;
+            });
+        });
+
+        // --- Submit prayer (public) ---
+        document.getElementById('prayerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!selectedCategory) { showToast('Please select an intercession category first', true); return; }
+
+            const name     = document.getElementById('name').value.trim();
+            const request  = document.getElementById('request').value.trim();
+            const duration = document.getElementById('duration').value;
+
+            await createPrayer({ category: selectedCategory, name, request, duration });
+            document.getElementById('prayerForm').reset();
+            showConfirmation();
+
+            // refresh admin prayers if admin is logged in
+            if (adminPassword) { loadAdminPrayers(); loadStats(); }
+        });
+
+        // --- New prayer button ---
+        document.getElementById('newPrayerBtn').addEventListener('click', showForm);
+
+        // --- Admin search / filter ---
+        document.getElementById('filterCategory').addEventListener('change', loadAdminPrayers);
+        document.getElementById('searchInput').addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(loadAdminPrayers, 300);
+        });
+
+        // --- Admin login ---
+        document.getElementById('adminToggle').addEventListener('click', () => {
+            if (adminPassword) {
+                document.getElementById('adminPanel').classList.toggle('visible');
+                if (document.getElementById('adminPanel').classList.contains('visible')) {
+                    loadStats();
+                    loadAdminPrayers();
+                }
+            } else {
+                document.getElementById('loginModal').classList.add('open');
+            }
+        });
+
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('loginModal').classList.remove('open');
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pw = document.getElementById('adminPassword').value;
+            const res = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pw })
+            });
+            if (res.ok) {
+                adminPassword = pw;
+                document.getElementById('loginModal').classList.remove('open');
+                document.getElementById('adminPanel').classList.add('visible');
+                document.getElementById('adminToggle').textContent = 'Admin (logged in)';
+                document.getElementById('adminPassword').value = '';
+                loadStats();
+                loadAdminPrayers();
+                showToast('Logged in as admin');
+            } else {
+                showToast('Invalid password', true);
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            adminPassword = null;
+            document.getElementById('adminPanel').classList.remove('visible');
+            document.getElementById('adminToggle').textContent = 'Admin';
+            document.getElementById('prayersContainer').innerHTML = '';
+            showToast('Logged out');
+        });
+
+        async function loadStats() {
+            const res = await fetch('/api/admin/stats', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: adminPassword })
+            });
+            const data = await res.json();
+            const grid = document.getElementById('statsGrid');
+
+            let html = `<div class="stat-card"><div class="stat-num">${data.total}</div><div class="stat-label">Total Intercessions</div></div>`;
+            for (const [key, cat] of Object.entries(categories)) {
+                const found = data.byCategory.find(r => r.category === key);
+                const count = found ? found.count : 0;
+                html += `<div class="stat-card"><div class="stat-num">${count}</div><div class="stat-label">${cat.icon} ${cat.name}</div></div>`;
+            }
+            grid.innerHTML = html;
+        }
+
+        document.getElementById('exportBtn').addEventListener('click', async () => {
+            const res = await fetch('/api/admin/export', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: adminPassword })
+            });
+            if (!res.ok) { showToast('Export failed', true); return; }
+            const blob = await res.blob();
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href = url;
+            a.download = 'prayer-requests.xlsx';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Excel file downloaded');
+        });
+    </script>
+</body>
+</html>

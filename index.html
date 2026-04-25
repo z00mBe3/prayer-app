@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prayer Requests</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #e8d5b7;
+        }
+        
+        header p {
+            color: #a0a0a0;
+        }
+        
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .category-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .category-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .category-btn.active {
+            background: #e8d5b7;
+            color: #1a1a2e;
+        }
+        
+        .category-btn .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .category-btn .label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .full-width {
+            grid-column: span 2;
+        }
+        
+        .prayer-form {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .prayer-form h2 {
+            margin-bottom: 20px;
+            color: #e8d5b7;
+            font-size: 1.3rem;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #e8d5b7;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #e8d5b7;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background: #d4c4a8;
+        }
+        
+        .prayers-list {
+            margin-top: 30px;
+        }
+        
+        .prayers-list h2 {
+            margin-bottom: 20px;
+            color: #e8d5b7;
+            font-size: 1.3rem;
+        }
+        
+        .prayer-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .prayer-card .category-tag {
+            display: inline-block;
+            background: rgba(232, 213, 183, 0.2);
+            color: #e8d5b7;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-bottom: 10px;
+        }
+        
+        .prayer-card .name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        
+        .prayer-card .request {
+            color: #c0c0c0;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        
+        .prayer-card .date {
+            color: #707070;
+            font-size: 0.8rem;
+        }
+        
+        .prayer-card .delete-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .prayer-card:hover .delete-btn {
+            opacity: 1;
+        }
+        
+        .prayer-card .delete-btn:hover {
+            color: #ff6b6b;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #707070;
+        }
+        
+        .prayer-count {
+            text-align: center;
+            color: #707070;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✝️ Prayer Requests</h1>
+            <p>Bring your intentions before God</p>
+        </header>
+        
+        <div class="categories">
+            <button class="category-btn" data-category="ill">
+                <div class="icon">🤒</div>
+                <div class="label">For the Ill</div>
+            </button>
+            <button class="category-btn" data-category="dead">
+                <div class="icon">🕯️</div>
+                <div class="label">For the Deceased</div>
+            </button>
+            <button class="category-btn" data-category="job">
+                <div class="icon">💼</div>
+                <div class="label">Job Search</div>
+            </button>
+            <button class="category-btn" data-category="pregnancy">
+                <div class="icon">👶</div>
+                <div class="label">Pregnancy & Children</div>
+            </button>
+            <button class="category-btn full-width" data-category="immigration">
+                <div class="icon">🌍</div>
+                <div class="label">Immigration (Residence, Citizenship, Work Permits)</div>
+            </button>
+            <button class="category-btn" data-category="reversion">
+                <div class="icon">✝️</div>
+                <div class="label">Reversion/Conversion</div>
+            </button>
+            <button class="category-btn" data-category="spouse">
+                <div class="icon">💑</div>
+                <div class="label">Future Spouse</div>
+            </button>
+        </div>
+        
+        <div class="prayer-form">
+            <h2 id="form-title">Submit a Prayer Request</h2>
+            <form id="prayerForm">
+                <div class="form-group">
+                    <label for="name">Your Name (or leave blank for anonymous)</label>
+                    <input type="text" id="name" placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label for="request">Prayer Request</label>
+                    <textarea id="request" placeholder="Share your prayer intention..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Submit Prayer</button>
+            </form>
+        </div>
+        
+        <div class="prayers-list">
+            <h2>All Prayers</h2>
+            <div class="prayer-count" id="prayerCount"></div>
+            <div id="prayersContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const categories = {
+            ill: { name: 'For the Ill', icon: '🤒' },
+            dead: { name: 'For the Deceased', icon: '🕯️' },
+            job: { name: 'Job Search', icon: '💼' },
+            pregnancy: { name: 'Pregnancy & Children', icon: '👶' },
+            immigration: { name: 'Immigration', icon: '🌍' },
+            reversion: { name: 'Reversion/Conversion', icon: '✝️' },
+            spouse: { name: 'Future Spouse', icon: '💑' }
+        };
+
+        let selectedCategory = null;
+        let prayers = JSON.parse(localStorage.getItem('prayers') || '[]');
+
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedCategory = btn.dataset.category;
+                document.getElementById('form-title').textContent = 
+                    `Submit a Prayer Request - ${categories[selectedCategory].name}`;
+            });
+        });
+
+        document.getElementById('prayerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (!selectedCategory) {
+                alert('Please select a category first');
+                return;
+            }
+
+            const name = document.getElementById('name').value.trim();
+            const request = document.getElementById('request').value.trim();
+
+            const prayer = {
+                id: Date.now(),
+                category: selectedCategory,
+                name: name || 'Anonymous',
+                request: request,
+                date: new Date().toLocaleDateString()
+            };
+
+            prayers.unshift(prayer);
+            localStorage.setItem('prayers', JSON.stringify(prayers));
+            
+            document.getElementById('prayerForm').reset();
+            renderPrayers();
+        });
+
+        function deletePrayer(id) {
+            prayers = prayers.filter(p => p.id !== id);
+            localStorage.setItem('prayers', JSON.stringify(prayers));
+            renderPrayers();
+        }
+
+        function renderPrayers() {
+            const container = document.getElementById('prayersContainer');
+            const countEl = document.getElementById('prayerCount');
+            
+            countEl.textContent = `${prayers.length} prayer${prayers.length !== 1 ? 's' : ''} submitted`;
+
+            if (prayers.length === 0) {
+                container.innerHTML = '<div class="empty-state">No prayers yet. Be the first to submit a prayer request.</div>';
+                return;
+            }
+
+            container.innerHTML = prayers.map(prayer => `
+                <div class="prayer-card">
+                    <button class="delete-btn" onclick="deletePrayer(${prayer.id})">&times;</button>
+                    <span class="category-tag">${categories[prayer.category].icon} ${categories[prayer.category].name}</span>
+                    <div class="name">${prayer.name}</div>
+                    <div class="request">${prayer.request}</div>
+                    <div class="date">${prayer.date}</div>
+                </div>
+            `).join('');
+        }
+
+        renderPrayers();
+    </script>
+</body>
+</html>
